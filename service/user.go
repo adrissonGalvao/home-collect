@@ -6,6 +6,8 @@ import (
 	"home-collect/repository"
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -42,4 +44,17 @@ func FindAllUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJson(w, http.StatusOK, users)
+}
+
+func FindOneUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	user, err := userRepository.FindByIdUser(params["Id"])
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	respondWithJson(w, http.StatusOK, user)
 }
