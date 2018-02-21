@@ -45,3 +45,29 @@ func (u *UserRepository) FindAllUser() ([]domain.User, error) {
 	return users, err
 
 }
+func (u *UserRepository) FindByIdUser(id string) (domain.User, error) {
+	sess := u.session.Copy()
+	defer sess.Clone()
+	var user domain.User
+
+	err := sess.DB(u.database).C("user").FindId(bson.ObjectIdHex(id)).One(&user)
+
+	return user, err
+}
+
+func (u *UserRepository) DeleteUser(user domain.User) error {
+	sess := u.session.Copy()
+	defer sess.Close()
+	err := sess.DB(u.database).C("user").Remove(&user)
+
+	return err
+}
+
+func (u *UserRepository) UpdateUser(user domain.User) error {
+	sess := u.session.Copy()
+	defer sess.Close()
+
+	err := sess.DB(u.database).C("user").UpdateId(user.ID, &user)
+
+	return err
+}
