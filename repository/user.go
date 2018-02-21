@@ -54,3 +54,20 @@ func (u *UserRepository) FindByIdUser(id string) (domain.User, error) {
 
 	return user, err
 }
+
+func (u *UserRepository) DeleteUser(user domain.User) error {
+	sess := u.session.Copy()
+	defer sess.Close()
+	err := sess.DB(u.database).C("user").Remove(&user)
+
+	return err
+}
+
+func (u *UserRepository) UpdateUser(user domain.User) error {
+	sess := u.session.Copy()
+	defer sess.Close()
+
+	err := sess.DB(u.database).C("user").UpdateId(user.ID, &user)
+
+	return err
+}
