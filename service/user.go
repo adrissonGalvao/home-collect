@@ -51,7 +51,7 @@ func FindOneUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 
-	user, err := userRepository.FindByIdUser(params["Id"])
+	user, err := userRepository.FindByIdUser(params["id"])
 
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid ID")
