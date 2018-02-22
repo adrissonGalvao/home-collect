@@ -6,9 +6,8 @@ import (
 
 type Sensor struct {
 	ID    bson.ObjectId `bson:"_id" json:"id"`
-	data  int64         `bson:"data" json:"data"`
-	name  string        `bson:"name" json:"name"`
-	token string        `bson:"token" json:"token"`
-	url   string        `bson:"url" json:"url"`
-	user  bson.ObjectId `bson:"user $ref:user" json:"user"`
+	Name  string        `bson:"name" json:"name"`
+	Token string        `bson:"token" json:"token"`
+	Url   string        `bson:"url" json:"url"`
+	User  bson.ObjectId `bson:"user $ref:user" json:"user"`
 }
