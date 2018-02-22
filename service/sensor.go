@@ -29,8 +29,10 @@ func CreateSensor(w http.ResponseWriter, r *http.Request) {
 	sensor.ID = bson.NewObjectId()
 	if err := sensorRepository.InsertSensor(sensor); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request")
+		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "sucess"})
+
 }
 
 func FindAllSensor(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +73,7 @@ func UpdateSensor(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := sensorRepository.UpdateSensor(sensor); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	respondWithJson(w, http.StatusOK, sensor)
