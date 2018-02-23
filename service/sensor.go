@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"home-collect/domain"
 	"home-collect/repository"
 	"net/http"
@@ -106,7 +105,7 @@ func DeleteSensor(w http.ResponseWriter, r *http.Request) {
 func verifyIntegrityUrlSensor(id string) bool {
 	statusUrl, err := sensorRepository.FindUrlSensor(id)
 	if err != nil {
-		fmt.Println("Error")
+		return false
 	}
 	return statusUrl
 }
