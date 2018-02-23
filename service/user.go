@@ -28,7 +28,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	user.ID = bson.NewObjectId()
 	if err := userRepository.InsertUser(user); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request")
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
