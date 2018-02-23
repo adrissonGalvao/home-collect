@@ -69,3 +69,14 @@ func (s *SensorRepository) UpdateSensor(sensor domain.Sensor) error {
 
 	return err
 }
+
+func (s *SensorRepository) FindUrlSensor(url string) (bool, error) {
+	sess := s.session.Copy()
+	defer sess.Close()
+	count, err := sess.DB(s.database).C("sensor").Find(bson.M{"url": url}).Count()
+	if count > 0 {
+		return false, err
+	}
+	return true, err
+
+}

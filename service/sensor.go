@@ -5,6 +5,7 @@ import (
 	"home-collect/domain"
 	"home-collect/repository"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -26,12 +27,17 @@ func CreateSensor(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	sensor.ID = bson.NewObjectId()
-	if err := sensorRepository.InsertSensor(sensor); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request")
-		return
+	sensor.Url = strings.ToLower(sensor.Url)
+	if statusUrl := verifyIntegrityUrlSensor(sensor.Url); statusUrl != false {
+		sensor.ID = bson.NewObjectId()
+		if err := sensorRepository.InsertSensor(sensor); err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid request")
+			return
+		}
+		respondWithJson(w, http.StatusOK, map[string]string{"result": "sucess"})
+	} else {
+		respondWithError(w, http.StatusBadRequest, "Not available url")
 	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "sucess"})
 
 }
 
@@ -94,4 +100,12 @@ func DeleteSensor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJson(w, http.StatusOK, sensor)
+}
+
+func verifyIntegrityUrlSensor(id string) bool {
+	statusUrl, err := sensorRepository.FindUrlSensor(id)
+	if err != nil {
+		return false
+	}
+	return statusUrl
 }
