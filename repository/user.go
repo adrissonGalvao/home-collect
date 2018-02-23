@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	DBSERVER = "localhost"
-	DBNAME   = "homeCollect"
+	DBSERVER = "mongodb://homecollect:homecollect@ds245548.mlab.com:45548/homecollect"
+	DBNAME   = "homecollect"
 )
 
 type UserRepository struct {
