@@ -80,3 +80,13 @@ func (s *SensorRepository) FindUrlSensor(url string) (bool, error) {
 	return true, err
 
 }
+
+func (s *SensorRepository) FindIdSensorByUrl(url string) (bson.ObjectId, error) {
+	sess := s.session.Copy()
+	defer sess.Close()
+	var sensor domain.Sensor
+
+	err := sess.DB(s.database).C("sensor").Find(bson.M{"url": url}).One(&sensor)
+
+	return sensor.ID, err
+}
