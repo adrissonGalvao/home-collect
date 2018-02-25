@@ -109,3 +109,6 @@ func verifyIntegrityUrlSensor(id string) bool {
 	}
 	return statusUrl
 }
+func OK(w http.ResponseWriter, r *http.Request) {
+	respondWithJson(w, http.StatusOK, map[string]string{"OK": "OK"})
+}
