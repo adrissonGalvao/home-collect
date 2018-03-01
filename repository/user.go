@@ -1,12 +1,10 @@
 package repository
 
 import (
+	"home-collect/database"
 	"home-collect/domain"
-	"log"
 
 	"gopkg.in/mgo.v2/bson"
-
-	mgo "gopkg.in/mgo.v2"
 )
 
 const (
@@ -14,60 +12,59 @@ const (
 	DBNAME   = "homecollect"
 )
 
-type UserRepository struct {
-	database string
-	session  *mgo.Session
+type IUserRepository interface {
+	InsertUser(user domain.User) error
+	FindAllUser() ([]domain.User, error)
+	FindByIdUser(id string) (domain.User, error)
+	DeleteUser(user domain.User) error
+	UpdateUser(user domain.User) error
 }
 
-func (u *UserRepository) Connect() {
-	session, err := mgo.Dial(DBSERVER)
-	u.database = DBNAME
-	if err != nil {
-		log.Fatal(err)
-	}
-	u.session = session
+type UserRepository struct {
+	*database.DB
 }
+
 func (u *UserRepository) InsertUser(user domain.User) error {
-	sess := u.session.Copy()
+	sess := u.Session.Copy()
 	defer sess.Close()
 
-	err := sess.DB(u.database).C("user").Insert(&user)
+	err := sess.DB(u.Database).C("user").Insert(&user)
 
 	return err
 }
 
 func (u *UserRepository) FindAllUser() ([]domain.User, error) {
-	sess := u.session.Copy()
+	sess := u.Session.Copy()
 	defer sess.Close()
 	var users []domain.User
 
-	err := sess.DB(u.database).C("user").Find(bson.M{}).All(&users)
+	err := sess.DB(u.Database).C("user").Find(bson.M{}).All(&users)
 	return users, err
 
 }
 func (u *UserRepository) FindByIdUser(id string) (domain.User, error) {
-	sess := u.session.Copy()
+	sess := u.Session.Copy()
 	defer sess.Clone()
 	var user domain.User
 
-	err := sess.DB(u.database).C("user").FindId(bson.ObjectIdHex(id)).One(&user)
+	err := sess.DB(u.Database).C("user").FindId(bson.ObjectIdHex(id)).One(&user)
 
 	return user, err
 }
 
 func (u *UserRepository) DeleteUser(user domain.User) error {
-	sess := u.session.Copy()
+	sess := u.Session.Copy()
 	defer sess.Close()
-	err := sess.DB(u.database).C("user").Remove(&user)
+	err := sess.DB(u.Database).C("user").Remove(&user)
 
 	return err
 }
 
 func (u *UserRepository) UpdateUser(user domain.User) error {
-	sess := u.session.Copy()
+	sess := u.Session.Copy()
 	defer sess.Close()
 
-	err := sess.DB(u.database).C("user").UpdateId(user.ID, &user)
+	err := sess.DB(u.Database).C("user").UpdateId(user.ID, &user)
 
 	return err
 }

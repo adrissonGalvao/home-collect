@@ -12,13 +12,20 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var sensorRepository = repository.SensorRepository{}
-
-func init() {
-	sensorRepository.Connect()
+type ISersoService interface {
+	Create(w http.ResponseWriter, r *http.Request)
+	FindAll(w http.ResponseWriter, r *http.Request)
+	FindOne(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
+	VerifyIntegrityUrlSensor(id string) bool
+	GeneratingUrlSensors() ([]string, error)
+}
+type SersoService struct {
+	repository.ISensorRepository
 }
 
-func CreateSensor(w http.ResponseWriter, r *http.Request) {
+func (s *SersoService) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var sensor domain.Sensor
@@ -28,9 +35,9 @@ func CreateSensor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sensor.Url = strings.ToLower(sensor.Url)
-	if statusUrl := verifyIntegrityUrlSensor(sensor.Url); statusUrl != false {
+	if statusUrl := s.VerifyIntegrityUrlSensor(sensor.Url); statusUrl != false {
 		sensor.ID = bson.NewObjectId()
-		if err := sensorRepository.InsertSensor(sensor); err != nil {
+		if err := s.InsertSensor(sensor); err != nil {
 			respondWithError(w, http.StatusBadRequest, "Invalid request")
 			return
 		}
@@ -41,10 +48,10 @@ func CreateSensor(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func FindAllSensor(w http.ResponseWriter, r *http.Request) {
+func (s *SersoService) FindAll(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
-	sensors, err := sensorRepository.FindAllSensor()
+	sensors, err := s.FindAllSensor()
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -54,11 +61,11 @@ func FindAllSensor(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensors)
 }
 
-func FindOneSensor(w http.ResponseWriter, r *http.Request) {
+func (s *SersoService) FindOne(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 
-	sensor, err := sensorRepository.FindByIdSensor(params["id"])
+	sensor, err := s.FindByIdSensor(params["id"])
 
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
@@ -68,7 +75,7 @@ func FindOneSensor(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensor)
 }
 
-func UpdateSensor(w http.ResponseWriter, r *http.Request) {
+func (s *SersoService) Update(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var sensor domain.Sensor
@@ -77,7 +84,7 @@ func UpdateSensor(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadGateway, err.Error())
 		return
 	}
-	if err := sensorRepository.UpdateSensor(sensor); err != nil {
+	if err := s.UpdateSensor(sensor); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -85,7 +92,7 @@ func UpdateSensor(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensor)
 }
 
-func DeleteSensor(w http.ResponseWriter, r *http.Request) {
+func (s *SersoService) Delete(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var sensor domain.Sensor
 
@@ -94,7 +101,7 @@ func DeleteSensor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := sensorRepository.DeleteSensor(sensor); err != nil {
+	if err := s.DeleteSensor(sensor); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -102,13 +109,20 @@ func DeleteSensor(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensor)
 }
 
-func verifyIntegrityUrlSensor(id string) bool {
-	statusUrl, err := sensorRepository.FindUrlSensor(id)
+func (s *SersoService) VerifyIntegrityUrlSensor(id string) bool {
+	statusUrl, err := s.FindUrlSensor(id)
 	if err != nil {
 		return false
 	}
 	return statusUrl
 }
-func OK(w http.ResponseWriter, r *http.Request) {
-	respondWithJson(w, http.StatusOK, map[string]string{"OK": "OK"})
+func (s *SersoService) GeneratingUrlSensors() ([]string, error) {
+
+	sensors, err := s.FindAllSensor()
+	var sensorUrls []string
+	for _, sensor := range sensors {
+		sensorUrls = append(sensorUrls, "/"+sensor.Url)
+
+	}
+	return sensorUrls, err
 }
