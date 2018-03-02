@@ -10,19 +10,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type ISersoDataService interface {
+type ISensorDataService interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	/*FindAll(w http.ResponseWriter, r *http.Request)
 	FindOne(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)*/
 }
-type SersoDataService struct {
+type SensorDataService struct {
 	repository.ISensorDataRepository
 	repository.ISensorRepository
 }
 
-func (sd *SersoDataService) Create(w http.ResponseWriter, r *http.Request) {
+func (sd *SensorDataService) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var data domain.SensorData
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {

@@ -12,8 +12,8 @@ import (
 
 type IServiceContainer interface {
 	InjectUserService() service.IUserService
-	InjectSensorService() service.ISersorService
-	InjectSensorDataService() service.ISersorDataService
+	InjectSensorService() service.ISensorService
+	InjectSensorDataService() service.ISensorDataService
 }
 
 type kernel struct{}
@@ -38,7 +38,7 @@ func (k *kernel) InjectUserService() service.IUserService {
 	return userService
 }
 
-func (k *kernel) InjectSensorService() service.ISersorService {
+func (k *kernel) InjectSensorService() service.ISensorService {
 	session, err := mgo.Dial(DBSERVER)
 	if err != nil {
 		log.Fatal(err)
@@ -48,11 +48,11 @@ func (k *kernel) InjectSensorService() service.ISersorService {
 	dbMongo.Database = DBNAME
 
 	sensorRepository := &repository.SensorRepository{dbMongo}
-	sensorService := &service.SersoService{sensorRepository}
+	sensorService := &service.SensorService{sensorRepository}
 
 	return sensorService
 }
-func (k *kernel) InjectSensorDataService() service.ISersorDataService {
+func (k *kernel) InjectSensorDataService() service.ISensorDataService {
 	session, err := mgo.Dial(DBSERVER)
 	if err != nil {
 		log.Fatal(err)
@@ -63,7 +63,7 @@ func (k *kernel) InjectSensorDataService() service.ISersorDataService {
 
 	sensorDataRepository := &repository.SensorDataRepository{dbMongo}
 	sensorRepository := &repository.SensorRepository{dbMongo}
-	sensorDataService := &service.SersoDataService{sensorDataRepository, sensorRepository}
+	sensorDataService := &service.SensorDataService{sensorDataRepository, sensorRepository}
 
 	return sensorDataService
 }

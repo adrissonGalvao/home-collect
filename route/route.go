@@ -33,7 +33,7 @@ func (router *router) InitRouter() *mux.Router {
 	r.HandleFunc("/sensors:id", sensorService.Update).Methods("PUT")
 	r.HandleFunc("/sensors:id", sensorService.FindOne).Methods("GET")
 
-	urlRoutes, err := sensorService.GeneratingUrlSensors()
+	urlRoutes, err := sensorService.GenerateUrlsSensor()
 	if err != nil {
 		log.Fatal(err)
 	}

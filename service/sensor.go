@@ -12,7 +12,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type ISersorService interface {
+type ISensorService interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	FindAll(w http.ResponseWriter, r *http.Request)
 	FindOne(w http.ResponseWriter, r *http.Request)
@@ -21,11 +21,11 @@ type ISersorService interface {
 	VerifyIntegrityUrlSensor(id string) bool
 	GenerateUrlsSensor() ([]string, error)
 }
-type SersoService struct {
+type SensorService struct {
 	repository.ISensorRepository
 }
 
-func (s *SersoService) Create(w http.ResponseWriter, r *http.Request) {
+func (s *SensorService) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var sensor domain.Sensor
@@ -48,7 +48,7 @@ func (s *SersoService) Create(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (s *SersoService) FindAll(w http.ResponseWriter, r *http.Request) {
+func (s *SensorService) FindAll(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	sensors, err := s.FindAllSensor()
@@ -61,7 +61,7 @@ func (s *SersoService) FindAll(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensors)
 }
 
-func (s *SersoService) FindOne(w http.ResponseWriter, r *http.Request) {
+func (s *SensorService) FindOne(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 
@@ -75,7 +75,7 @@ func (s *SersoService) FindOne(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensor)
 }
 
-func (s *SersoService) Update(w http.ResponseWriter, r *http.Request) {
+func (s *SensorService) Update(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var sensor domain.Sensor
@@ -92,7 +92,7 @@ func (s *SersoService) Update(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensor)
 }
 
-func (s *SersoService) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *SensorService) Delete(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var sensor domain.Sensor
 
@@ -109,14 +109,14 @@ func (s *SersoService) Delete(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, sensor)
 }
 
-func (s *SersoService) VerifyIntegrityUrlSensor(id string) bool {
+func (s *SensorService) VerifyIntegrityUrlSensor(id string) bool {
 	statusUrl, err := s.FindUrlSensor(id)
 	if err != nil {
 		return false
 	}
 	return statusUrl
 }
-func (s *SersoService) GenerateUrlsSensor() ([]string, error) {
+func (s *SensorService) GenerateUrlsSensor() ([]string, error) {
 
 	sensors, err := s.FindAllSensor()
 	var sensorUrls []string
