@@ -1,31 +1,23 @@
 package repository
 
 import (
+	"home-collect/database"
 	"home-collect/domain"
-	"log"
-
-	mgo "gopkg.in/mgo.v2"
 )
 
 type SensorDataRepository struct {
-	database string
-	session  *mgo.Session
+	*database.DB
 }
 
-func (sd *SensorDataRepository) Connect() {
-	session, err := mgo.Dial(DBSERVER)
-	sd.database = DBNAME
-	if err != nil {
-		log.Fatal(err)
-	}
-	sd.session = session
+type ISensorDataRepository interface {
+	InsertSensorData(url string, data domain.SensorData) error
 }
 
 func (sd *SensorDataRepository) InsertSensorData(url string, data domain.SensorData) error {
-	sess := sd.session.Copy()
+	sess := sd.Session.Copy()
 	defer sess.Close()
 
-	err := sess.DB(sd.database).C(url).Insert(&data)
+	err := sess.DB(sd.Database).C(url).Insert(&data)
 
 	return err
 }

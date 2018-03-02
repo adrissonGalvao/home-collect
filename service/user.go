@@ -7,17 +7,24 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-
 	"gopkg.in/mgo.v2/bson"
 )
 
 var userRepository = repository.UserRepository{}
 
-func init() {
-	userRepository.Connect()
+type IUserService interface {
+	Create(w http.ResponseWriter, r *http.Request)
+	FindAll(w http.ResponseWriter, r *http.Request)
+	FindOne(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+type UserService struct {
+	repository.IUserRepository
+}
+
+func (us *UserService) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var user domain.User
 
@@ -27,7 +34,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.ID = bson.NewObjectId()
-	if err := userRepository.InsertUser(user); err != nil {
+	if err := us.InsertUser(user); err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -35,9 +42,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "sucess"})
 
 }
-func FindAllUser(w http.ResponseWriter, r *http.Request) {
+
+func (us *UserService) FindAll(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	users, err := userRepository.FindAllUser()
+	users, err := us.FindAllUser()
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -47,11 +55,11 @@ func FindAllUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, users)
 }
 
-func FindOneUser(w http.ResponseWriter, r *http.Request) {
+func (us *UserService) FindOne(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 
-	user, err := userRepository.FindByIdUser(params["id"])
+	user, err := us.FindByIdUser(params["id"])
 
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid ID")
@@ -61,7 +69,7 @@ func FindOneUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, user)
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (us *UserService) Delete(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var user domain.User
 
@@ -70,7 +78,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := userRepository.DeleteUser(user); err != nil {
+	if err := us.DeleteUser(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -79,7 +87,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func (us *UserService) Update(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var user domain.User
 
@@ -88,7 +96,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := userRepository.UpdateUser(user); err != nil {
+	if err := us.UpdateUser(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
