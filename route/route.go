@@ -2,6 +2,7 @@ package route
 
 import (
 	"home-collect/servicecontainer"
+	"log"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -17,6 +18,7 @@ func (router *router) InitRouter() *mux.Router {
 	serviceContainer := servicecontainer.ServiceContainer()
 	userService := serviceContainer.InjectUserService()
 	sensorService := serviceContainer.InjectSensorService()
+	sensorDataService := serviceContainer.InjectSensorDataService()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/users", userService.Create).Methods("POST")
@@ -31,6 +33,16 @@ func (router *router) InitRouter() *mux.Router {
 	r.HandleFunc("/sensors:id", sensorService.Update).Methods("PUT")
 	r.HandleFunc("/sensors:id", sensorService.FindOne).Methods("GET")
 
+	urlRoutes, err := sensorService.GeneratingUrlSensors()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, url := range urlRoutes {
+		r.HandleFunc(url, sensorDataService.Create).Methods("POST")
+	}
+
+	log.Println("Routes created")
 	return r
 }
 
