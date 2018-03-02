@@ -19,7 +19,7 @@ type ISersorService interface {
 	Delete(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
 	VerifyIntegrityUrlSensor(id string) bool
-	GeneratingUrlSensors() ([]string, error)
+	GenerateUrlsSensor() ([]string, error)
 }
 type SersoService struct {
 	repository.ISensorRepository
@@ -116,7 +116,7 @@ func (s *SersoService) VerifyIntegrityUrlSensor(id string) bool {
 	}
 	return statusUrl
 }
-func (s *SersoService) GeneratingUrlSensors() ([]string, error) {
+func (s *SersoService) GenerateUrlsSensor() ([]string, error) {
 
 	sensors, err := s.FindAllSensor()
 	var sensorUrls []string

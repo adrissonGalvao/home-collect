@@ -12,8 +12,8 @@ import (
 
 type IServiceContainer interface {
 	InjectUserService() service.IUserService
-	InjectSensorService() service.ISersoService
-	InjectSensorDataService() service.ISersoDataService
+	InjectSensorService() service.ISersorService
+	InjectSensorDataService() service.ISersorDataService
 }
 
 type kernel struct{}
@@ -38,7 +38,7 @@ func (k *kernel) InjectUserService() service.IUserService {
 	return userService
 }
 
-func (k *kernel) InjectSensorService() service.ISersoService {
+func (k *kernel) InjectSensorService() service.ISersorService {
 	session, err := mgo.Dial(DBSERVER)
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +52,7 @@ func (k *kernel) InjectSensorService() service.ISersoService {
 
 	return sensorService
 }
-func (k *kernel) InjectSensorDataService() service.ISersoDataService {
+func (k *kernel) InjectSensorDataService() service.ISersorDataService {
 	session, err := mgo.Dial(DBSERVER)
 	if err != nil {
 		log.Fatal(err)
