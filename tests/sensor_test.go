@@ -34,7 +34,7 @@ func TestGeneratingUrlSensors(t *testing.T) {
 	sensors = append(sensors, sensor)
 	sensorRepositoryMock.On("FindAllSensor").Return(sensors, nil)
 	sensorService := service.SersoService{sensorRepositoryMock}
-	resultTest, err := sensorService.GeneratingUrlSensors()
+	resultTest, err := sensorService.GenerateUrlsSensor()
 	assert.Error(t, err, "GeneratingUrlSensors return error")
 	assert.Equal(t, "/"+sensor.Url, resultTest[0])
 
