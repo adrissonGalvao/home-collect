@@ -12,7 +12,7 @@ import (
 
 type ISensorDataService interface {
 	Create(w http.ResponseWriter, r *http.Request)
-	/*FssssssindAll(w http.ResponseWriter, r *http.Request)
+	/*FssssssssssindAll(w http.ResponseWriter, r *http.Request)
 	FindOne(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)*/
