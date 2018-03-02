@@ -19,6 +19,7 @@ func (sm *ISensorRepository) InsertSensor(sensor domain.Sensor) error {
 
 func (sm *ISensorRepository) FindAllSensor() ([]domain.Sensor, error) {
 	args := sm.Called()
+
 	var sensors []domain.Sensor
 	sensor := domain.Sensor{}
 	sensor.ID = bson.NewObjectId()
@@ -26,7 +27,8 @@ func (sm *ISensorRepository) FindAllSensor() ([]domain.Sensor, error) {
 	sensor.Token = "teste"
 	sensor.Url = "teste"
 	sensor.User = sensor.ID
-	sensors[0] = sensor
+
+	sensors = append(sensors, sensor)
 	return sensors, args.Error(1)
 }
 
