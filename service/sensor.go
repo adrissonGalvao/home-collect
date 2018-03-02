@@ -12,7 +12,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type ISersoService interface {
+type ISersorService interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	FindAll(w http.ResponseWriter, r *http.Request)
 	FindOne(w http.ResponseWriter, r *http.Request)
