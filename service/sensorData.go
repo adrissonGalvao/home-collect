@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
 type ISensorDataService interface {
 	Create(w http.ResponseWriter, r *http.Request)
-	/*FindAll(w http.ResponseWriter, r *http.Request)
+	FindAll(w http.ResponseWriter, r *http.Request)
 	FindOne(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)*/
 }
 type SensorDataService struct {
 	repository.ISensorDataRepository
@@ -44,6 +44,30 @@ func (sd *SensorDataService) Create(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "sucess"})
 }
 
+func (sd *SensorDataService) FindAll(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	url := extractUrlSensor(r)
+	sensorsData, err := sd.FindAllSensorData(url)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, sensorsData)
+}
+
+func (sd *SensorDataService) FindOne(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	params := mux.Vars(r)
+	url := extractUrlSensor(r)
+	sensorData, err := sd.FindByIdSendorData(params["id"], url)
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	respondWithJson(w, http.StatusOK, sensorData)
+}
 func extractUrlSensor(r *http.Request) string {
 	uri := r.RequestURI
 	uri = strings.Replace(uri, "/", "", 1)
