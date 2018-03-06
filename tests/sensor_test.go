@@ -6,7 +6,7 @@ import (
 	mock "home-collect/tests/mocks"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/smartystreets/goconvey/convey"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -17,30 +17,41 @@ func TestVerifyIntegrityUrlSensor(t *testing.T) {
 
 	sensorService := service.SensorService{sensorRepositoryMock}
 
-	resultTest := sensorService.VerifyIntegrityUrlSensor("teste")
+	Convey("Sending URL: Teste", t, func() {
+		Convey("Checking integruty of url sent", func() {
+			resultTest := sensorService.VerifyIntegrityUrlSensor("teste")
+			Convey("Validated url", func() {
+				So(resultTest, ShouldEqual, true)
+			})
+		})
+	})
 
-	assert.Equal(t, true, resultTest)
 }
 
-func TestGeneratingUrlSensors(t *testing.T) {
+func TestGenerateUrlsSensor(t *testing.T) {
 	sensorRepositoryMock := new(mock.ISensorRepository)
+	Convey("Creating sensor for test", t, func() {
+		var sensors []domain.Sensor
 
-	var sensors []domain.Sensor
+		sensor := domain.Sensor{}
+		sensor.ID = bson.NewObjectId()
+		sensor.Name = "teste"
+		sensor.Token = "teste"
+		sensor.Url = "teste"
+		sensor.User = sensor.ID
 
-	sensor := domain.Sensor{}
-	sensor.ID = bson.NewObjectId()
-	sensor.Name = "teste"
-	sensor.Token = "teste"
-	sensor.Url = "teste"
-	sensor.User = sensor.ID
+		sensors = append(sensors, sensor)
 
-	sensors = append(sensors, sensor)
+		sensorRepositoryMock.On("FindAllSensor").Return(sensors, nil)
 
-	sensorRepositoryMock.On("FindAllSensor").Return(sensors, nil)
-
-	sensorService := service.SensorService{sensorRepositoryMock}
-	resultTest, _ := sensorService.GenerateUrlsSensor()
-
-	assert.Equal(t, "/"+sensor.Url, resultTest[0])
-
+		sensorService := service.SensorService{sensorRepositoryMock}
+		Convey("Generating Url for routes", func() {
+			resultTest, _ := sensorService.GenerateUrlsSensor()
+			Convey("verifying that the URLs were created correctly", func() {
+				Convey("Url gererated correctly", func() {
+					So("/"+sensors[0].Url, ShouldEqual, resultTest[0])
+				})
+			})
+		})
+	})
 }

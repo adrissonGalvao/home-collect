@@ -40,6 +40,8 @@ func (router *router) InitRouter() *mux.Router {
 
 	for _, url := range urlRoutes {
 		r.HandleFunc(url, sensorDataService.Create).Methods("POST")
+		r.HandleFunc(url, sensorDataService.FindAll).Methods("GET")
+		r.HandleFunc(url+":id", sensorDataService.FindOne).Methods("GET")
 	}
 
 	log.Println("Routes created")
